@@ -154,6 +154,21 @@ Vue.component('post-refence',{
 	},
 });
 
+const loadList=((cache)=>()=>{
+	if(cache!==undefined){
+		return Promise.resolve(cache);
+	}
+	return axios({
+		method:'get',
+		url:'./blog-list.json',
+		responseType:'json',
+	})
+	.then((result)=>{
+		cache=result;
+		return result;
+	});
+})(undefined);
+
 Vue.component('blog-list',{
 	template:`
 		<div>
@@ -166,13 +181,11 @@ Vue.component('blog-list',{
 		};
 	},
 	mounted(){
-		axios({
-			method:'get',
-			url:'./blog-list.json',
-			responseType:'json',
-		}).then(({data})=>{
+		loadList()
+		.then(({data})=>{
 			this.list=data;
-		}).catch((reason)=>{
+		})
+		.catch((reason)=>{
 			console.error('blog-post',reason);
 		});
 	},
@@ -324,14 +337,14 @@ Vue.component('blog-context',{
 });
 
 Vue.component('comment-area',{
-	props:['gittalkid'],
-	template:`<div><div></div></div>`,
+	props:['gitalkid'],
+	template:`<div class="contains"><h2>评论区</h2><div></div></div>`,
 	methods:{
 		updateId(){
 			var el=this.$el;
-			el.removeChild(el.children[0]);
-			if(typeof this.gittalkid!=='undefined'){
-				var gitalkEl=this.els[this.gittalkid];
+			el.removeChild(el.children[1]);
+			if(typeof this.gitalkid!=='undefined'){
+				var gitalkEl=this.els[this.gitalkid];
 				if(typeof gitalkEl==='undefined'){
 					const gitalk = new Gitalk({
 						clientID: '2404bbe3ef6f6fe0b9de',
@@ -339,12 +352,12 @@ Vue.component('comment-area',{
 						repo: 'lmoliver.github.io',
 						owner: 'LMOliver',
 						admin: ['LMOliver'],
-						id: this.gittalkid,
+						id: this.gitalkid,
 						distractionFreeMode: false,
 					});
-					this.els[this.gittalkid]=document.createElement('div');
-					gitalk.render(this.els[this.gittalkid]);
-					gitalkEl=this.els[this.gittalkid];
+					this.els[this.gitalkid]=document.createElement('div');
+					gitalk.render(this.els[this.gitalkid]);
+					gitalkEl=this.els[this.gitalkid];
 				}
 				el.appendChild(gitalkEl);
 			}else{
@@ -353,7 +366,7 @@ Vue.component('comment-area',{
 		},
 	},
 	watch:{
-		gittalkid(){
+		gitalkid(){
 			this.updateId();
 		}
 	},
@@ -375,7 +388,6 @@ function renderMetadata({title='无标题',time='',description=''}){
 	`;
 }
 
-
 function renderMarkdown(md){
 	return marked(
 		md.replace(/\$.+?\$/g,
@@ -383,8 +395,8 @@ function renderMarkdown(md){
 				throwOnError: false
 			})
 		),{
-			highlight: function (code,lang) {
-				if(lang==="")return code;
+			highlight(code,lang) {
+				if(!lang)return code;
 				try{
 					return hljs.highlight(lang,code).value;
 				}

@@ -75,7 +75,7 @@ int main(){
 }
 ```
 
-[提交记录](https://codeforces.com/contest/1204/problem/E)
+[提交记录](https://codeforces.com/contest/1204/submission/60369172)
 
 ……
 

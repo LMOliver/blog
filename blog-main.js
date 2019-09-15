@@ -8,11 +8,11 @@ function getBlogHref(){
 function updateHref(){
 	var href=getBlogHref();
 	this.context='<p>Loading...</p>';
-	this.commentId=undefined;
+	this.commentID=undefined;
 	makeTitle('Loading...');
 	loadInfo(href).then(({data:{title,time,description,comment=true}})=>{
 		makeTitle(title);
-		this.commentId=comment?('blog-'+href):undefined;
+		this.commentID=comment?('blog-'+href):undefined;
 		this.context=renderMetadata({title,time,description});
 		return loadContext(href);
 	}).then(({data})=>{
@@ -36,7 +36,7 @@ var app = new Vue({
 	el: '#app',
 	data:{
 		context:'',
-		commentId:undefined,
+		commentID:undefined,
 	},
 	mounted(){
 		window.onhashchange=()=>updateHref.call(this);
